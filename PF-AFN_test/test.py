@@ -35,6 +35,8 @@ total_steps = (start_epoch-1) * dataset_size + epoch_iter
 step = 0
 step_per_batch = dataset_size / opt.batchSize
 
+imname_list = sorted(os.listdir(os.path.join(opt.dataroot, 'test_img')))
+
 for epoch in range(1,2):
 
     for i, data in enumerate(dataset, start=epoch_iter):
@@ -46,13 +48,13 @@ for epoch in range(1,2):
         clothes = data['clothes']
         ##edge is extracted from the clothes image with the built-in function in python
         edge = data['edge']
-        edge = torch.FloatTensor((edge.detach().numpy() > 0.5).astype(np.int))
+        edge = torch.FloatTensor((edge.detach().numpy() > 0.5).astype(int))
         clothes = clothes * edge        
 
         flow_out = warp_model(real_image.cuda(), clothes.cuda())
         warped_cloth, last_flow, = flow_out
         warped_edge = F.grid_sample(edge.cuda(), last_flow.permute(0, 2, 3, 1),
-                          mode='bilinear', padding_mode='zeros')
+                          mode='bilinear', padding_mode='zeros', align_corners=True)
 
         gen_inputs = torch.cat([real_image.cuda(), warped_cloth, warped_edge], 1)
         gen_outputs = gen_model(gen_inputs)
@@ -75,7 +77,7 @@ for epoch in range(1,2):
             cv_img=(combine.permute(1,2,0).detach().cpu().numpy()+1)/2
             rgb=(cv_img*255).astype(np.uint8)
             bgr=cv2.cvtColor(rgb,cv2.COLOR_RGB2BGR)
-            cv2.imwrite(sub_path+'/'+str(step)+'.jpg',bgr)
+            cv2.imwrite(sub_path + '/' + imname_list[step], bgr)
 
         step += 1
         if epoch_iter >= dataset_size:

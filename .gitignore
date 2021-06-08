@@ -3,5 +3,5 @@
 .vscode/*
 gen_model_final.pth
 warp_model_final.pth
-PF-AFN_test/result/VITON_test/*
+PF-AFN_test/result/test_VITON/*
 PF-AFN_test/VITON_test/*

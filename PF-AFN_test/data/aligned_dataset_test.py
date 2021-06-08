@@ -7,11 +7,12 @@ class AlignedDataset(BaseDataset):
     def initialize(self, opt):
         self.opt = opt
         self.root = opt.dataroot
+        self.datalist = opt.datalist
 
         self.fine_height=256
         self.fine_width=192
 
-        self.dataset_size = len(open('demo.txt').readlines())
+        self.dataset_size = len(open(opt.datalist).readlines())
 
         dir_I = '_img'
         self.dir_I = os.path.join(opt.dataroot, opt.phase + dir_I)
@@ -24,7 +25,7 @@ class AlignedDataset(BaseDataset):
 
     def __getitem__(self, index):        
 
-        file_path ='demo.txt'
+        file_path = self.datalist
         im_name, c_name = linecache.getline(file_path, index+1).strip().split()
 
         I_path = os.path.join(self.dir_I,im_name)
